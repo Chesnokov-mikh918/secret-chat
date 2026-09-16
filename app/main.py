@@ -3,7 +3,6 @@ import uvicorn
 from database import engine
 from models import Base
 from auth import auth_router
-import asyncio
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
@@ -21,11 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.get("/")
-def check():
-    return {"Hello": "me"}
-
 app.include_router(auth_router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app")
+    uvicorn.run("main:app", reload=True)

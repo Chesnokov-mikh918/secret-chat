@@ -9,9 +9,9 @@ class UserSchemaOut(Base):
     email: EmailStr
     model_config = ConfigDict(from_attributes=True)
 
-class Tokens(Base):
-    access_token: str
-    refresh_token: str
+class Token(Base):
+    token: str
+    token_type: str
 
 class UserRegister(Base):
     username: str = Field(min_length=2, max_length=20)
@@ -25,12 +25,3 @@ class UserRegister(Base):
             raise ValueError("Passwords are not the same")
         return self
     
-# class MessageSchema(Base):
-#     id: int
-#     text: str
-
-# try:
-#     a = UserRegister(login='asd', password='abc', repeat_password='aec')
-#     print(a.login)
-# except ValueError as e:
-#     print(e) 
