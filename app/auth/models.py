@@ -11,8 +11,3 @@ class UserModel(Base):
     hashed_password: Mapped[str] = mapped_column(String(150))
     email: Mapped[str] = mapped_column(String(255), unique=True)
     refresh_token: Mapped[str] = mapped_column(String(255), default="")
-
-class MessageBase(Base):
-    __tablename__ = "messages"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    text: Mapped[str] = mapped_column(String(200))
