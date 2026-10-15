@@ -3,8 +3,7 @@ from pwdlib import PasswordHash
 from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
-from database import get_async_db
-from sqlalchemy.ext.asyncio import AsyncSession
+from database import DbSession
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, or_, update
@@ -13,10 +12,8 @@ from auth.schemas import UserSchemaOut, Token, UserRegister
 import uuid
 import hashlib
 
-
 auth_router = APIRouter()
 
-DbSession = Annotated[AsyncSession, Depends(get_async_db)]
 LoginData = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 def get_hash_for_refresh(refr_tok: str) -> str:
@@ -37,7 +34,7 @@ def set_tokens_in_cookie(response: Response, access_token: str, refresh_token: s
         value = access_token,
         httponly = True,
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        secure=True,
+        secure=False,
         samesite="lax",
     )
 
@@ -45,7 +42,7 @@ def set_tokens_in_cookie(response: Response, access_token: str, refresh_token: s
         key='refresh_token',
         value = refresh_token,
         httponly = True,
-        secure=True,
+        secure=False,
         samesite="lax",
     )
 
@@ -125,7 +122,7 @@ async def login_for_access_token(response: Response, data: LoginData, db: DbSess
     return Token(token=access_token, token_type = "access_token")
     # В гите еще разобраться что делают кнопки индексировать изменения и делают ли они коммит таким образзом или нет
 
-@auth_router.post("/register")
+@auth_router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(user: UserRegister, db: DbSession):
     query = select(UserModel).where(
         or_(
